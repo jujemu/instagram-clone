@@ -1,0 +1,6 @@
+poetry.lock
+__pycache__
+*.pyc
+.DS_Store
+*.swp
+*.db
