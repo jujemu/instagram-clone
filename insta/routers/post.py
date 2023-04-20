@@ -1,5 +1,6 @@
 import datetime
 import random
+import shutil
 import string
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
@@ -30,11 +31,20 @@ def create_post(
     return db_post.create(request, db)
 
 
+# Upload image
 @router.post('/image')
 def upload_image(image: UploadFile = File(...)):
     # for unique name of image
     letters = string.ascii_letters
-    rand_str = ''.join([random.choice(letters) for _ in range(5)]) + datetime.datetime.now().strftime("%Y-%m-%d")
+    rand_str = ''.join([random.choice(letters) for _ in range(2)]) + datetime.datetime.now().strftime("%Y-%m-%d")
+    new = f'_{rand_str}.'
+    filename = new.join(image.filename.rsplit('.', 1))
+    path = f'images/{filename}'
+    
+    with open(path, 'w+b') as buffer:
+        shutil.copyfileobj(image.file, buffer)
+        
+    return {'filename': path} 
     
     
 @router.get('', response_model=list[PostDisplay])
